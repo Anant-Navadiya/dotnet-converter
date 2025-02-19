@@ -54,7 +54,7 @@ def rename_and_move_files():
         pre, ext = os.path.splitext(file_name)
 
         old_path = os.path.join(SOURCE_FOLDER, file_name)
-        new_path = os.path.join(DESTINATION_FOLDER, pre + '.' + NEW_EXTENSION)
+        new_path = os.path.join(DESTINATION_FOLDER, kebab_to_title(pre) + '.' + NEW_EXTENSION)
 
         os.rename(old_path, new_path)
         print(f"Renamed: {old_path} -> {new_path}")
