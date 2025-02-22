@@ -21,7 +21,7 @@ while inserting specific content based on the file structure.
 
 1. **Clone the repository**:
    ```
-   git clone https://github.com/Anant-Navadiya/dotnet-file-extention-renamer.git
+   git clone https://github.com/Anant-Navadiya/dotnet-converter.git
    ```
 
 2. **Modify the script:**
