@@ -71,10 +71,11 @@ after running the script, the files in the dist/ folder will be:
 
 ```
 dist/
-├── FileOne.cshtml
-├── FileOne.cshtml.cs
-├── FileTwo.cshtml
-├── FileTwo.cshtml.cs
-├── FileThree.cshtml
-└── FileThree.cshtml.cs
+└── File
+    ├── One.cshtml
+    ├── One.cshtml.cs
+    ├── Two.cshtml
+    ├── Two.cshtml.cs
+    ├── Three.cshtml
+    └── Three.cshtml.cs
 ```

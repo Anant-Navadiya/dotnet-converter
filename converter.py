@@ -17,14 +17,23 @@ APP_NAME = "Highdmin"
 
 
 def process_file_name(file_name):
-    """Processes the file name to extract folder and model names."""
-    pre, ext = os.path.splitext(file_name)
+    """Processes the file name to extract folder, file and model names."""
+    pre, _ = os.path.splitext(file_name)
     split_name = pre.split('-')
 
     folder_name = split_name[0].capitalize()
-    model_name = (split_name[1].capitalize() + 'Model') if len(split_name) > 1 else 'IndexModel'
 
-    return pre, folder_name, model_name
+    if len(split_name) > 1:
+        if split_name[1].isdigit():
+            file_name = folder_name + split_name[1].capitalize()
+        else:
+            file_name = split_name[1].capitalize()
+    else:
+        file_name = "Index"
+
+    model_name = f"{file_name}Model"
+
+    return pre, folder_name, file_name, model_name
 
 
 def add_additional_extension_files():
@@ -32,14 +41,16 @@ def add_additional_extension_files():
     Creates additional files with an extra extension in the destination folder.
     The content of these files is generated using `set_content()`.
     """
-    os.makedirs(DESTINATION_FOLDER, exist_ok=True)
 
     for file_name in os.listdir(SOURCE_FOLDER):
-        pre, folder_name, model_name = process_file_name(file_name)
-        new_file_name = f"{kebab_to_title(pre)}.{NEW_EXTENSION}.{ADDITIONAL_EXTENSION}"
+        pre, folder_name, file_name, model_name = process_file_name(file_name)
+
+        os.makedirs(DESTINATION_FOLDER + folder_name + '/', exist_ok=True)
+
+        new_file_name = f"{file_name}.{NEW_EXTENSION}.{ADDITIONAL_EXTENSION}"
         content = set_content(APP_NAME, folder_name, model_name)
 
-        file_path = os.path.join(DESTINATION_FOLDER, new_file_name)
+        file_path = os.path.join(DESTINATION_FOLDER + folder_name + '/', new_file_name)
 
         try:
             with open(file_path, "w", encoding="utf-8") as file:
@@ -54,19 +65,36 @@ def rename_and_move_files():
     Iterates over files in SOURCE_FOLDER, renames them to PascalCase,
     changes their extension, adds content, and moves them to DESTINATION_FOLDER.
     """
-    os.makedirs(DESTINATION_FOLDER, exist_ok=True)
 
     if NEED_ADDITIONAL_EXTENSION:
         add_additional_extension_files()
 
-    for file_name in os.listdir(SOURCE_FOLDER):
-        pre, folder_name, model_name = process_file_name(file_name)
+    for old_file_name in os.listdir(SOURCE_FOLDER):
+        pre, folder_name, file_name, model_name = process_file_name(old_file_name)
 
-        old_path = os.path.join(SOURCE_FOLDER, file_name)
-        new_file_name = f"{kebab_to_title(pre)}.{NEW_EXTENSION}"
-        new_path = os.path.join(DESTINATION_FOLDER, new_file_name)
+        os.makedirs(DESTINATION_FOLDER + folder_name + '/', exist_ok=True)
 
-        new_line = f"""@page "/{pre}"\n@model {APP_NAME}.Pages.{folder_name}.{model_name}\n"""
+        old_path = os.path.join(SOURCE_FOLDER, old_file_name)
+        new_file_name = f"{file_name}.{NEW_EXTENSION}"
+        new_path = os.path.join(DESTINATION_FOLDER + folder_name + '/', new_file_name)
+
+        new_line = f"""@page "/{pre}"\n@model {APP_NAME}.Pages.{folder_name}.{model_name}\n
+@{{
+    ViewBag.Title = "{file_name}";
+    ViewBag.SubTitle = "{folder_name}";
+}}
+
+@section styles
+{{
+
+}}
+
+@section scripts
+{{
+
+}}
+
+"""
 
         try:
             # Read the file content
@@ -84,5 +112,6 @@ def rename_and_move_files():
 
         except IOError as e:
             print(f"Error processing {old_path}: {e}")
+
 
 rename_and_move_files()
